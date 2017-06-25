@@ -44,7 +44,7 @@ LDFLAGS ?= -Wl,-O1,--sort-common
 
 USE_CFLAGS = ${CFLAGS} -Wall -std=gnu99 ${LDFLAGS}
 
-USE_CFLAGS_EXEC = ${USE_CFLAGS} -lrt -L "${_LIB_PATH}" -Wl,-rpath="${_LIB_PATH}" -lshmfile
+USE_CFLAGS_EXEC = ${USE_CFLAGS} -L "${_LIB_PATH}" -Wl,-rpath="${_LIB_PATH}" -lshmfile
 
 USE_CFLAGS_LIB = ${USE_CFLAGS} -fPIC -lrt -shared
 
