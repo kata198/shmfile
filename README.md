@@ -29,6 +29,8 @@ Public Functions
 
 **fshm\_open** - Opens a stream
 
+FILE\* fshm\_open(const char\* name, mode\_t mode, int fshm\_flags);
+
 
 	/**
 	 * fshm_open - Open a shared memory and export as a STREAM, 
@@ -80,6 +82,7 @@ Public Functions
 
 **fshm\_force\_destroy** - Forcibly destroys a stream, as a recovery tool.
 
+int  fshm\_force\_destroy(const char\* name);
 
 	/**
 	 * fshm_force_destroy - Forcibly destroy the shared memory region associated
