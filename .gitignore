@@ -1,0 +1,7 @@
+*.o
+*~
+*.bak
+a.out
+owner
+guest
+libshmfile.so
