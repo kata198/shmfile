@@ -24,11 +24,15 @@
 
 #ifdef __GNUC__
 
-#define __visibility_hidden  __attribute__( (visibility ("hidden")) )
+    #define __visibility_hidden  __attribute__( (visibility ("hidden")) )
+    #define likely(x)    __builtin_expect(!!(x),1)
+    #define unlikely(x)  __builtin_expect(!!(x),0)
 
 #else
 
-#define __visibility_hidden
+    #define __visibility_hidden
+    #define likely(x)   ( !!(x) )
+    #define unlikely(x) ( !!(x) )
 
 #endif
 
@@ -107,7 +111,7 @@ __visibility_hidden int _fshm_seek(void *cookie, off_t *offset, int whence)
 
     newOffset = lseek(fshmCookie->fd, *offset, whence);
 
-    if ( newOffset >= 0 )
+    if ( likely( newOffset >= 0 ) )
     {
         *offset = newOffset;
         ret = 0;
@@ -153,7 +157,7 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
     FILE *fObj;
 
 
-    if ( ! ( fshm_flags & (FSHM_OWNER | FSHM_GUEST) ) )
+    if ( unlikely( ! ( fshm_flags & (FSHM_OWNER | FSHM_GUEST) ) ) )
     {
         printerr("Error: fshm_open called but flags specified neither FSHM_OWNER nor FSHM_GUEST.\n");
         errno = EINVAL;
@@ -161,7 +165,7 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
         return NULL;
     }
 
-    if ( !name || name[0] == '\0' )
+    if ( unlikely( !name || name[0] == '\0' ) )
     {
         printerr("Error: fshm_open called with NULL/empty \"name\" parameter.\n");
         errno = EINVAL;
@@ -173,7 +177,7 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
 
     if ( fshm_flags & FSHM_OWNER )
     {
-        if ( fshm_flags & FSHM_GUEST )
+        if ( unlikely( fshm_flags & FSHM_GUEST ) )
         {
             printerr("Error: fshm_open called with both FSHM_OWNER and FSHM_GUEST\n");
             errno = EINVAL;
@@ -185,11 +189,11 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
 
     fd = shm_open(name, oflag, mode);
 
-    if ( fd < 0 )
+    if ( unlikely( fd < 0 ) )
         return NULL;
 
     cookie = malloc( sizeof(struct fshm_cookie) );
-    if ( !cookie )
+    if ( unlikely( !cookie ) )
     {
         errno = ENOMEM;
         return NULL;
@@ -221,7 +225,7 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
     }
 
     fObj = fopencookie(cookie, modeStr, fshmIoFuncs);
-    if ( !fObj )
+    if ( unlikely( ! fObj ) )
     {
         _fshm_close(cookie);
         return NULL;
