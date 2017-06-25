@@ -161,7 +161,6 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
     {
         printerr("Error: fshm_open called but flags specified neither FSHM_OWNER nor FSHM_GUEST.\n");
         errno = EINVAL;
-        /* TODO: Errno? */
         return NULL;
     }
 
@@ -169,7 +168,6 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
     {
         printerr("Error: fshm_open called with NULL/empty \"name\" parameter.\n");
         errno = EINVAL;
-        /* TODO: Errno? */
         return NULL;
     }
 
