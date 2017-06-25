@@ -52,6 +52,18 @@
 #define IS_FSHM_FLAGS_OWNER(_fshm_flags) !!( _fshm_flags & FSHM_OWNER )
 #define IS_FSHM_FLAGS_GUEST(_fshm_flags) !!( _fshm_flags & FSHM_GUEST )
 
+
+static volatile const char *copyright = "Copyright (c) 2017 Timothy Savannah   All Rights Reserved,  licensed under terms of Lesser GNU Public License version 2.1";
+
+static volatile const char *product_name = "shmfile";
+static volatile const char *version   = "Version 0.1.0";
+
+
+void _fshm_printCopyrightVersion(void)
+{
+    printf("%s %s\n%s\n\n", product_name, version, copyright);
+}
+
 __visibility_hidden struct fshm_cookie {
     
     int fd;
