@@ -6,21 +6,44 @@ Small shared library to use shared memory as a FILE\* , with interprocess commun
 Basic Design
 ============
 
-The basic design is that a process is in one of two "groups":
+**Overview**
 
-* FSHM\_OWNER - This process creates the stream, and when it closes the stream, the stream will be destroyed.
+shmfile is desgined in an "owner/guest" format.
 
-* FSHM\_GUEST - This process "connects" to an existing stream.
-
-
-The "stream" is associated by an arbitrary FS-like name, like "/streams/my\_stream"
-
-The stream also has an associated mode, which is an octal following standard unix mode rules  ( think chmod ).
+One process is the *owner* [FSHM\_OWMER] of a shared mapping (given by a string name). It creates the mapping, and can destroy it.
 
 
-This stream can be used with buffered-IO or unbuffered-IO functions, anywhere a *FILE* or *int fd* is accepted.
+Other processes then can map that same string name as *guest* [FSHM\_GUEST].
 
-You may write anything to this stream, structs, lists, whatever.
+
+The guest only needs to know the unique name that the owner picked to have access to the data.
+
+
+**Permissions**
+
+Permissions follow the "mode" design, just like UNIX filesystems do (think *chmod*).
+
+
+You specify the mode when the *owner* creates the shmfile, which will later determine whomelse on the system may have access.
+
+
+**Usage**
+
+
+The *fshm\_open* function returns a FILE\* object, with a valid integer file descriptor [ fd ].
+
+You can read/write the data using either the buffered I/O functions (like fread, fwrite, fseek) and flushing with fflush, OR
+
+the unbuffered I/O functions (like read, write, lseek).
+
+
+The size is completely automatic, you do not need to allocate an underlying buffer -- any data written to it and flushed will
+expand the buffer automatically.
+
+
+There is no built-in locking, so it's suggested if you are going to have multiple processes writing to the stream, that you either use fixed-size sections for each process,
+
+or implement your own locking.
 
 
 Public Functions
@@ -30,6 +53,9 @@ Public Functions
 **fshm\_open** - Opens a stream
 
 FILE\* fshm\_open(const char\* name, mode\_t mode, int fshm\_flags);
+
+
+This is the "core" function, as fshm allows you to use all the other I/O systems that come standard with libc.
 
 
 	/**
