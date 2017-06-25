@@ -71,7 +71,6 @@ void _fshm_printCopyrightVersion(void)
 __visibility_hidden struct fshm_cookie {
     
     int fd;
-    off_t pos;
     char *name;
     int fshm_flags;
 
@@ -202,7 +201,6 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
 
     strcpy(nameCpy, name);
 
-    cookie->pos = 0;
     cookie->fshm_flags = fshm_flags;
     cookie->fd = fd;
     cookie->name = nameCpy;
