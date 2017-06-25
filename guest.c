@@ -23,14 +23,14 @@
 #include <unistd.h>
 #include <errno.h>
 
-static char *DEFAULT_STREAM_NAME = "/test1";
+#include "owner_guest_private.h"
 
 int main(int argc, char* argv[])
 {
     FILE *fObj;
 
-    char *data;
     char *streamName;
+    OwnerGuestData data = { 0 };
 
     if ( argc == 1 )
     {
@@ -55,15 +55,26 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    data = malloc(200);
+    read( fileno(fObj), &data, sizeof(OwnerGuestData) );
 
-    read( fileno(fObj), data, 200 );
+    printf("Message is: %s\n", data.msg);
+    printf("Previous accesses: %d\n", data.numAccess);
+    printf("Previous pid: %d\n", data.lastAccessPid);
 
-    printf("Data is: %s\n", data);
+    data.numAccess += 1;
+    data.lastAccessPid = getpid();
+
+    fseek(fObj, 0, SEEK_SET);
+
+    fwrite(&data, sizeof(OwnerGuestData), 1, fObj);
+    fflush(fObj);
+
+    write( fileno(fObj), &data, sizeof(OwnerGuestData) );
+
+    printf("\nUpdated dataset.\n");
+
 
     fclose(fObj);
-    free(data);
-
 
     return 0;
 }

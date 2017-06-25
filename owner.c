@@ -24,18 +24,18 @@
 #include <unistd.h>
 #include <errno.h>
 
-#define DEFAULT_SLEEP_TIME 10
+#include "owner_guest_private.h"
 
-static char *DEFAULT_STREAM_NAME = "/test1";
+#define DEFAULT_SLEEP_TIME 10
 
 
 int main(int argc, char* argv[])
 {
     FILE *fObj;
 
-    char *data;
     char *streamName;
     int sleepTime;
+    OwnerGuestData data = { 0 };
 
     if ( argc == 1 )
     {
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
     {
         if ( errno == EEXIST )
         {
-            fprintf(stderr, "Existing stream, forcing close.\n");
+            fprintf(stderr, "-- Existing stream, forcing close.\n\n");
             fshm_force_destroy(streamName);
             fObj = fshm_open(streamName, 0775, FSHM_OWNER);
         }
@@ -82,21 +82,15 @@ handle_fobj_null:
         return 1;
     }
 
-    fprintf(fObj, "Hello World\n");
+    strcpy(data.msg, "Hello World!\n");
+    data.numAccess = 0;
+    data.lastAccessPid = getpid();
 
-    fseek(fObj, 0, SEEK_SET);
-
-    data = malloc(200);
-
-    fread(data, 1, 200, fObj);
-
-    printf("Data is: %s\n", data);
-
+    write( fileno(fObj), &data, sizeof(OwnerGuestData) );
 
     sleep(sleepTime);
 
     fclose(fObj);
-    free(data);
 
 
     return 0;

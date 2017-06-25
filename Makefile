@@ -21,9 +21,9 @@ clean:
 libshmfile.so: shmfile.c shmfile.h
 	gcc shmfile.c ${USE_CFLAGS_LIB} -o libshmfile.so
 
-owner: owner.c shmfile.h
+owner: owner.c shmfile.h owner_guest_private.h
 	gcc owner.c ${USE_CFLAGS_EXEC} -o owner
 
-guest: guest.c shmfile.h
+guest: guest.c shmfile.h owner_guest_private.h
 	gcc guest.c ${USE_CFLAGS_EXEC} -o guest
 
