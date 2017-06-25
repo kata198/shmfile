@@ -15,7 +15,12 @@ The basic design is that a process is in one of two "groups":
 
 The "stream" is associated by an arbitrary FS-like name, like "/streams/my\_stream"
 
-The stream also has an associated mode, which is an octal following standard unix mode rules  ( think chmod )
+The stream also has an associated mode, which is an octal following standard unix mode rules  ( think chmod ).
+
+
+This stream can be used with buffered-IO or unbuffered-IO functions, anywhere a *FILE* or *int fd* is accepted.
+
+You may write anything to this stream, structs, lists, whatever.
 
 
 Public Functions
@@ -57,10 +62,13 @@ Public Functions
 	 *      and share data between them.
 	 *
 	 *     There is a real FD associated with this FILE (unlike, open_memstream, for example).
-	 *       The same position pointers are used for the fd-functions (like read, write) as
-	 *       the FILE functions (like fread, fwrite).
+	 *     
+	 *     You may choose to use either the buffered variants ( like fwrite, fread), 
+	 *       or the unbuffered variants (like write, read).
 	 *
-	 *     No buffering occurs (because it's to memory), so read/fread act the same.
+	 *     Keep in mind that if you use the buffered functions, you must call fflush to
+	 *       sync the changes.
+	 *
 	 *
 	 *     You can use this object anywhere a FILE* is allowed, or anywhere an fd is allowed
 	 *      by calling fileno(X) where X is the FILE* returned by this function.
@@ -113,3 +121,9 @@ Examples
 owner ( from owner.c )  is an example that creates a stream ( as FSHM\_OWNER ), writes some data to it, and leaves it open for a period of time.
 
 guest ( from guest.c )  is an example that connects to an existing stream ( as FSHM\_GUEST ), reads data from it, and prints it to stdout.
+
+
+These examples use a struct which is given initial values by "owner", and is updated each time "guest" is run.
+
+The examples show both buffered I/O (fwrite and fflush), as well as unbuffered I/O (read and write).
+

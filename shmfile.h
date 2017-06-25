@@ -78,10 +78,13 @@ extern "C" {
  *      and share data between them.
  *
  *     There is a real FD associated with this FILE (unlike, open_memstream, for example).
- *       The same position pointers are used for the fd-functions (like read, write) as
- *       the FILE functions (like fread, fwrite).
+ *     
+ *     You may choose to use either the buffered variants ( like fwrite, fread), 
+ *       or the unbuffered variants (like write, read).
  *
- *     No buffering occurs (because it's to memory), so read/fread act the same.
+ *     Keep in mind that if you use the buffered functions, you must call fflush to
+ *       sync the changes.
+ *
  *
  *     You can use this object anywhere a FILE* is allowed, or anywhere an fd is allowed
  *      by calling fileno(X) where X is the FILE* returned by this function.
