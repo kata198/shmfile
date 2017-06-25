@@ -69,7 +69,7 @@ void _fshm_printCopyrightVersion(void)
 }
 
 __visibility_hidden struct fshm_cookie {
-    
+
     int fd;
     char *name;
     int fshm_flags;
@@ -221,7 +221,7 @@ _created_ok:
     cookie->fshm_flags = fshm_flags;
     cookie->fd = fd;
     cookie->name = nameCpy;
-    
+
     fshmIoFuncs.read = _fshm_read;
     fshmIoFuncs.write = _fshm_write;
     fshmIoFuncs.seek = _fshm_seek;
@@ -236,7 +236,7 @@ _created_ok:
     {
         modeStr = "r+";
     }
-    
+
     fObj = fopencookie(cookie, modeStr, fshmIoFuncs);
     if ( unlikely( ! fObj ) )
     {
