@@ -1,7 +1,7 @@
 
 .PHONY: all clean
 
-_LIB_PATH = /home/media/projects/shmfile
+_LIB_PATH = $(shell pwd)
 
 CFLAGS ?= -O2 -s
 
