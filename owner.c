@@ -82,14 +82,19 @@ handle_fobj_null:
         return 1;
     }
 
+    printf("Writing data...\n\n");
+
     strcpy(data.msg, "Hello World!\n");
     data.numAccess = 0;
     data.lastAccessPid = getpid();
 
     write( fileno(fObj), &data, sizeof(OwnerGuestData) );
 
+    printf("Waiting %d seconds before closing stream.\n\n", sleepTime);
+
     sleep(sleepTime);
 
+    printf("Removing stream..\n");
     fclose(fObj);
 
 
