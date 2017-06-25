@@ -148,7 +148,7 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
 
     char *nameCpy;
     size_t nameLen;
-    const char* modeStr;
+    const char* modeStr = NULL;
 
     struct fshm_cookie *cookie;
     cookie_io_functions_t fshmIoFuncs;
@@ -187,7 +187,24 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
     fd = shm_open(name, oflag, mode);
 
     if ( unlikely( fd < 0 ) )
+    {
+        if ( fshm_flags & FSHM_GUEST && errno == EACCES)
+        {
+            /*
+             * Guest and write denied,
+             * Try read only
+             * */
+            oflag = O_RDONLY;
+            fd = shm_open(name, oflag, mode);
+            if ( fd >= 0 )
+            {
+                modeStr = "r";
+                goto _created_ok;
+            }
+        }
         return NULL;
+    }
+_created_ok:
 
     cookie = malloc( sizeof(struct fshm_cookie) );
     if ( unlikely( !cookie ) )
@@ -215,11 +232,11 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
     {
         modeStr = "w+";
     }
-    else
+    else if ( likely(modeStr == NULL) )
     {
         modeStr = "r+";
     }
-
+    
     fObj = fopencookie(cookie, modeStr, fshmIoFuncs);
     if ( unlikely( ! fObj ) )
     {
