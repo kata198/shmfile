@@ -70,6 +70,9 @@ distclean: clean
 install: libshmfile.so
 	mkdir -p "${INSTALLPREFIX}/lib"
 	install -m 775 libshmfile.so "${INSTALLPREFIX}/lib"
+	mkdir -p "${INSTALLPREFIX}/include"
+	install -m 664 shmfile.h "${INSTALLPREFIX}/include"
+
 
 libshmfile.so: shmfile.c shmfile.h
 	gcc shmfile.c ${USE_CFLAGS_LIB} -o libshmfile.so
