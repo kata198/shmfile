@@ -62,6 +62,23 @@ static volatile const char *copyright = "Copyright (c) 2017 Timothy Savannah   A
 static volatile const char *product_name = "shmfile";
 static volatile const char *version   = "Version 0.1.1";
 
+typedef struct {
+    char major;
+    char minor;
+    char patchlevel;
+    const char *extra;
+}_shmfile_version_info_t;
+
+static volatile _shmfile_version_info_t _shmfile_version_info = { 0, 1, 1, "" };
+
+
+void shmfile_get_version(char *major, char *minor, char *patchlevel, const char **extra)
+{
+    *major = _shmfile_version_info.major;
+    *minor = _shmfile_version_info.minor;
+    *patchlevel = _shmfile_version_info.patchlevel;
+    *extra = _shmfile_version_info.extra;
+}
 
 void _fshm_printCopyrightVersion(void)
 {

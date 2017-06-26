@@ -144,6 +144,14 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags);
  */
 int  fshm_force_destroy(const char* name);
 
+/****************
+ * shmfile_get_version - Get the version info on this version of shmfile
+ *
+ *    Sets the value of *major, *minor, *patchlevel, and *extra to the numeric version numbers
+ */
+void shmfile_get_version(char *major, char *minor, char *patchlevel, const char **extra);
+
+
 #if defined (__cplusplus)
 } /* extern "C" */
 #endif
