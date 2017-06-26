@@ -21,10 +21,15 @@ The guest only needs to know the unique name that the owner picked to have acces
 
 **Permissions**
 
-Permissions follow the "mode" design, just like UNIX filesystems do (think *chmod*).
+Permissions for who can map the same shm as FSHM\_GUEST are specified by the octal: "mode".
+
+These follow the same rules as chmod. For example, same user only and read-only would be 0400. Same user r/w, all other users r/o, 0644
 
 
 You specify the mode when the *owner* creates the shmfile, which will later determine whomelse on the system may have access.
+
+
+The mode specified by guest mappings will be attempted, but if created with lower permissions what the owner set will be used.
 
 
 **Usage**
@@ -59,13 +64,35 @@ This is the "core" function, as fshm allows you to use all the other I/O systems
 
 
 	/**
-	 * fshm_open - Open a shared memory and export as a STREAM, 
+	 * fshm_open - Open a shared memory and export as a STREAM,
 	 *   which will work with both FILE* and int filedes functions
 	 *    (e.x.  fwrite and write, fread and read, etc).
 	 *
 	 *  name - A name which corrosponds to this stream.
 	 *
-	 *  mode - An octal representing the "mode", same as chmod
+	 *
+	 *  mode - An octal representing the "mode" for guest mappings.
+	 *           Mode has same meaning as with chmod.
+	 *         This mode will be used to determine how FSHM_GUEST
+	 *           mappings will be able to access this stream.
+	 *
+	 *
+	 *         A guest may request any mode, but if the requested mode
+	 *           exceeds what the owner set, the guest's permissions
+	 *           will not be truncated to match the owner's maximum mode.
+	 *
+	 *
+	 *      Examples:
+	 *
+	 *        Allow current user only to map as guest, read/write:
+	 *          0600
+	 *
+	 *        Allow current user only to map as guest, read-only:
+	 *          0400
+	 *
+	 *        Allow anybody on system to map read/write:
+	 *          0777
+	 *
 	 *
 	 *  fshm_flags - A list of flags OR'd together
 	 *
@@ -90,8 +117,8 @@ This is the "core" function, as fshm allows you to use all the other I/O systems
 	 *      and share data between them.
 	 *
 	 *     There is a real FD associated with this FILE (unlike, open_memstream, for example).
-	 *     
-	 *     You may choose to use either the buffered variants ( like fwrite, fread), 
+	 *
+	 *     You may choose to use either the buffered variants ( like fwrite, fread),
 	 *       or the unbuffered variants (like write, read).
 	 *
 	 *     Keep in mind that if you use the buffered functions, you must call fflush to
