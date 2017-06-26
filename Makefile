@@ -6,6 +6,10 @@
 #
 #      all (default) - Builds libshmfile.so, and the example programs: owner and guest
 #
+#      debug         - Build libshmfile.so with debug flags
+#
+#      static        - Build libshmfile.so as a static lib
+#
 #      install       - Installs libshmfile.so into $DESTDIR/$PREFIX/lib . So default is /usr/lib,
 #                        to install to /usr/local instead, do:      make install PREFIX="/usr/local"
 #
@@ -28,7 +32,7 @@
 #############################################
 
 
-.PHONY: all install clean distclean
+.PHONY: all install clean distclean debug static
 
 # _LIB_PATH - Used as a hack so owner/guest programs work without doing an install
 _LIB_PATH = $(shell pwd)
@@ -41,6 +45,8 @@ _LIB_PATH = $(shell pwd)
 CFLAGS ?= -O2 -s
 
 LDFLAGS ?= -Wl,-O1,--sort-common
+
+DEBUG_CFLAGS = -Og -ggdb3
 
 USE_CFLAGS = ${CFLAGS} -Wall -std=gnu99 ${LDFLAGS}
 
@@ -62,8 +68,13 @@ INSTALLPREFIX = $(shell echo "${DESTDIR}/${PREFIX}" | sed 's|//|/|g')
 
 all: libshmfile.so owner guest
 
+debug: libshmfile.so owner guest
+	make clean; make CFLAGS="${DEBUG_CFLAGS}" LDFLAGS=""
+
+static: libshmfile.a
+
 clean:
-	rm -f libshmfile.so owner guest
+	rm -f libshmfile.so owner guest libshmfile.a
 
 distclean: clean
 
@@ -73,6 +84,8 @@ install: libshmfile.so
 	mkdir -p "${INSTALLPREFIX}/include"
 	install -m 664 shmfile.h "${INSTALLPREFIX}/include"
 
+libshmfile.a: shmfile.c shmfile.h
+	gcc shmfile.c ${USE_CFLAGS_LIB} -shared -o libshmfile.a
 
 libshmfile.so: shmfile.c shmfile.h
 	gcc shmfile.c ${USE_CFLAGS_LIB} -o libshmfile.so
