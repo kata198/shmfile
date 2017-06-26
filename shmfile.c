@@ -60,7 +60,7 @@
 static volatile const char *copyright = "Copyright (c) 2017 Timothy Savannah   All Rights Reserved,  licensed under terms of Lesser GNU Public License version 2.1";
 
 static volatile const char *product_name = "shmfile";
-static volatile const char *version   = "Version 0.1.0";
+static volatile const char *version   = "Version 0.1.1";
 
 
 void _fshm_printCopyrightVersion(void)
