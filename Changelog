@@ -1,0 +1,23 @@
+1.0.0 - ??? ?? ????
+
+* Makefile: updates, bugfixes, expansion, cleanup
+
+ - Makefile: Remove *.o files as part of clean
+
+ - Fix the static build of the lib (it was building a dynamic library named .a prior... whoops!)
+
+ - Add a target, "install_static" which works the same way as "install" but only installs the archive (libshmfile.a)
+ - Add a target, "static_debug" which recompiles the static lib using debug flags
+
+ - Split out libshmfile.o into its own unit
+
+* Cleanup and separate examples from base code
+
+ - Create a new directory "examples"
+ - Move 'owner.c' and 'guest.c' and 'owner_guest_private.h' into this 'examples' directory
+
+ - Remove "examples" from the "all" target into its own target "examples" as the example code is not required to build libshmfile.so or libshmfile.a
+  
+  * Add "examples" target which will compile the example code
+  * Add "examples_debug" target which will compile the example code with debug CFLAGS
+
