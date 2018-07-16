@@ -37,7 +37,6 @@
 # _LIB_PATH - Used as a hack so owner/guest programs work without doing an install
 _LIB_PATH = $(shell pwd)
 
-
 ##############
 ## Variables
 ###########
@@ -58,6 +57,7 @@ DESTDIR ?=
 
 PREFIX ?= /usr
 
+EXAMPLES_ADDITIONAL_FLAGS = -I "${_LIB_PATH}" -Wl,-rpath="${_LIB_PATH}"
 
 INSTALLPREFIX = $(shell echo "${DESTDIR}/${PREFIX}" | sed 's|//|/|g')
 
@@ -66,15 +66,15 @@ INSTALLPREFIX = $(shell echo "${DESTDIR}/${PREFIX}" | sed 's|//|/|g')
 ## Targets
 ##########
 
-all: libshmfile.so owner guest
+all: libshmfile.so
 
-debug: libshmfile.so owner guest
+debug: libshmfile.so
 	make clean; make CFLAGS="${DEBUG_CFLAGS}" LDFLAGS=""
 
 static: libshmfile.a
 
 clean:
-	rm -f libshmfile.so owner guest libshmfile.a
+	rm -f libshmfile.so examples/owner examples/guest libshmfile.a
 
 distclean: clean
 
@@ -84,15 +84,21 @@ install: libshmfile.so
 	mkdir -p "${INSTALLPREFIX}/include"
 	install -m 664 shmfile.h "${INSTALLPREFIX}/include"
 
+
+examples: libshmfile.so examples/owner examples/guest
+
+examples_debug: libshmfile.so examples/owner examples/guest
+	make clean; make CFLAGS="${DEBUG_CFLAGS}" LDFLAGS="" examples
+
 libshmfile.a: shmfile.c shmfile.h
 	gcc shmfile.c ${USE_CFLAGS_LIB} -shared -o libshmfile.a
 
 libshmfile.so: shmfile.c shmfile.h
 	gcc shmfile.c ${USE_CFLAGS_LIB} -o libshmfile.so
 
-owner: owner.c shmfile.h owner_guest_private.h
-	gcc owner.c ${USE_CFLAGS_EXEC} -o owner
+examples/owner: examples/owner.c examples/owner_guest_private.h shmfile.h 
+	gcc examples/owner.c ${USE_CFLAGS_EXEC} ${EXAMPLES_ADDITIONAL_FLAGS} -o examples/owner
 
-guest: guest.c shmfile.h owner_guest_private.h
-	gcc guest.c ${USE_CFLAGS_EXEC} -o guest
+examples/guest: examples/guest.c examples/owner_guest_private.h shmfile.h 
+	gcc examples/guest.c ${USE_CFLAGS_EXEC} ${EXAMPLES_ADDITIONAL_FLAGS} -o examples/guest
 
