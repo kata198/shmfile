@@ -58,20 +58,43 @@ extern "C" {
  *         This mode will be used to determine how FSHM_GUEST
  *           mappings will be able to access this stream.
  *
- *         A guest may request any mode, but if the requested mode
- *           exceeds what the owner set, the guest's permissions
- *           will not be truncated to match the owner's maximum mode.
+ *         Columns:
  *
- *      Examples:
+ *          - First column from left is always 0 for now (no sticky/setguid bit meaning)
+ *          - Second column from left is permissions for owner (user who creates shmfile)
+ *          - Third column from the left is permissions for users who share primary
+ *            group with creating user
+ *          - Fourth column from the left are permissions for any user which
+ *            does NOT fall into any categories listed above
+ *
+ *         Values:
+ *
+ *          For each column, the number is derived by starting with 0
+ *            and following these rules:
+ *
+ *           - Add 4 to allow guest mapping and read for represented set
+ *           - Add 2 to allow writing to the mapping
+ *           - Add 1 to allow execution
+ *
+ *         A guest may request any mode, but if the requested mode
+ *           exceeds what the owner set when creating, the guest's permissions
+ *           will be truncated to match the owner's maximum mode.
+ *
+ *  Examples - Some examples of various #mode[s] and their meaning
  *
  *        Allow current user only to map as guest, read/write:
- *          0600
+ *           0600
  *
  *        Allow current user only to map as guest, read-only:
- *          0400
+ *           0400
+ *
+ *        Allow current user to map as guest, read and write,
+ *          allow a different user belonging to same primary group
+ *          to map as guest read-only:
+ *           0640
  *
  *        Allow anybody on system to map read/write:
- *          0777
+ *           0777
  *
  *
  *

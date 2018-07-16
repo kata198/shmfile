@@ -208,7 +208,7 @@ FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
         if ( fshm_flags & FSHM_GUEST && errno == EACCES)
         {
             /*
-             * Guest and write denied,
+             * Guest read and write denied,
              * Try read only
              * */
             oflag = O_RDONLY;
