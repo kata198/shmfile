@@ -84,17 +84,23 @@ install: libshmfile.so
 	mkdir -p "${INSTALLPREFIX}/include"
 	install -m 664 shmfile.h "${INSTALLPREFIX}/include"
 
+install_static: libshmfile.a
+	mkdir -p "${INSTALLPREFIX}/lib"
+	install -m 644 libshmfile.a "${INSTALLPREFIX}/lib"
 
 examples: libshmfile.so examples/owner examples/guest
 
 examples_debug: libshmfile.so examples/owner examples/guest
 	make clean; make CFLAGS="${DEBUG_CFLAGS}" LDFLAGS="" examples
 
-libshmfile.a: shmfile.c shmfile.h
-	gcc shmfile.c ${USE_CFLAGS_LIB} -shared -o libshmfile.a
+libshmfile.a: shmfile.o
+	ar rcs libshmfile.a shmfile.o
 
-libshmfile.so: shmfile.c shmfile.h
-	gcc shmfile.c ${USE_CFLAGS_LIB} -o libshmfile.so
+libshmfile.so: shmfile.o
+	gcc shmfile.o ${USE_CFLAGS_LIB} -shared -o libshmfile.so
+
+shmfile.o: shmfile.c shmfile.h
+	gcc shmfile.c ${USE_CFLAGS_LIB} -c -o shmfile.o
 
 examples/owner: examples/owner.c examples/owner_guest_private.h shmfile.h 
 	gcc examples/owner.c ${USE_CFLAGS_EXEC} ${EXAMPLES_ADDITIONAL_FLAGS} -o examples/owner
@@ -102,3 +108,4 @@ examples/owner: examples/owner.c examples/owner_guest_private.h shmfile.h
 examples/guest: examples/guest.c examples/owner_guest_private.h shmfile.h 
 	gcc examples/guest.c ${USE_CFLAGS_EXEC} ${EXAMPLES_ADDITIONAL_FLAGS} -o examples/guest
 
+# vim: set ts=4 sw=4 st=4 noexpandtab:
