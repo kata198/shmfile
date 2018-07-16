@@ -5,3 +5,4 @@ a.out
 owner
 guest
 libshmfile.so
+libshmfile.a
