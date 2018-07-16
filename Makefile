@@ -74,7 +74,7 @@ debug: libshmfile.so
 static: libshmfile.a
 
 clean:
-	rm -f libshmfile.so examples/owner examples/guest libshmfile.a
+	rm -f libshmfile.so libshmfile.a examples/owner.o examples/owner examples/guest.o examples/guest shmfile.o
 
 distclean: clean
 
