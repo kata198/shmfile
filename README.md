@@ -29,7 +29,7 @@ These follow the same rules as chmod. For example, same user only and read-only 
 You specify the mode when the *owner* creates the shmfile, which will later determine whomelse on the system may have access.
 
 
-The mode specified by guest mappings will be attempted, but if created with lower permissions what the owner set will be used.
+The guest opening the already-created shmfile ( using FSHM\_GUEST ) may specify different permissions than those which the FSHM\_OWNER set on the shmfile, but they cannot exceed the owner's permissions. If such is attempted, for example if owner sets mode to 0644 and guest tries to open the stream with 0666, the guest's mode will be forced to 0644.
 
 
 **Usage**
