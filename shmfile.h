@@ -75,7 +75,7 @@ extern "C" {
  *
  *                 * See fshm_open for more info
  */
-FILE* fshm_create(const char* name, mode_t mode);
+FILE* fshm_create(const char *name, mode_t mode);
 
 
 /**
@@ -97,7 +97,7 @@ FILE* fshm_create(const char* name, mode_t mode);
  *
  *                 * See fshm_open for more info
  */
-FILE *fshm_guest_open(const char* name);
+FILE *fshm_guest_open(const char *name);
 
 
 /**
@@ -193,11 +193,14 @@ FILE *fshm_guest_open(const char* name);
  *      by calling fileno(X) where X is the FILE* returned by this function.
  *
  */
-FILE* fshm_open(const char* name, mode_t mode, int fshm_flags);
+FILE* fshm_open(const char *name, mode_t mode, int fshm_flags);
 
 
 /**
  * fshm_chgrp - Change the group that owns this shmfile.
+ *
+ *      You must be the the same user as the FSHM_OWNER of the given stream,
+ *        or root in order to change the gid assigned to the shmfile.
  *
  *      The shmfile created by fshm_open is assigned the gid
  *        matching the primary group of the creating user.
@@ -258,9 +261,9 @@ int fshm_chgrp(FILE *fshm_file, gid_t group);
  *  RETURN:
  *    0 on success, -1 on error.
  */
-int  fshm_force_destroy(const char* name);
+int  fshm_force_destroy(const char *name);
 
-/****************
+/**
  * shmfile_get_version - Get the version info on this version of shmfile
  *
  *    Sets the value of *major, *minor, *patchlevel, and *extra to the numeric version numbers

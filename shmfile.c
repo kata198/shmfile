@@ -158,14 +158,14 @@ __visibility_hidden int _fshm_close(void *cookie)
     return ret;
 }
 
-FILE* fshm_open(const char* name, mode_t mode, int fshm_flags)
+FILE* fshm_open(const char *name, mode_t mode, int fshm_flags)
 {
     int fd;
     int oflag;
 
     char *nameCpy;
     size_t nameLen;
-    const char* modeStr = NULL;
+    const char *modeStr = NULL;
 
     struct fshm_cookie *cookie;
     cookie_io_functions_t fshmIoFuncs;
@@ -267,13 +267,13 @@ _created_ok:
     return fObj;
 }
 
-FILE* fshm_create(const char* name, mode_t mode)
+FILE* fshm_create(const char *name, mode_t mode)
 {
     return fshm_open(name, mode, FSHM_OWNER);
 }
 
 
-FILE *fshm_guest_open(const char* name)
+FILE *fshm_guest_open(const char *name)
 {
     return fshm_open(name, 0, FSHM_GUEST);
 }
@@ -315,7 +315,7 @@ int fshm_chgrp(FILE *fshm_file, gid_t group)
     return 0;
 }
 
-int fshm_force_destroy(const char* name)
+int fshm_force_destroy(const char *name)
 {
     return shm_unlink(name);
 }
