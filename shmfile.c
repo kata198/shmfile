@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017 Timothy Savannah
+ * Copyright (c) 2017, 2018 Timothy Savannah
  *   All Rights Reserved, Licensed under terms of Lesser GNU Public License version 2.1
  *
  * shmfile.c - Definitions and private attributes for shmfile

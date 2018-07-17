@@ -1,7 +1,7 @@
 #ifndef _SHM_FILE_H
 #define _SHM_FILE_H
 /**
- * Copyright (c) 2017 Timothy Savannah
+ * Copyright (c) 2017, 2018 Timothy Savannah
  *   All Rights Reserved, Licensed under terms of Lesser GNU Public License version 2.1
  *
  * shmfile.h - Header for shmfile
