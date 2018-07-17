@@ -267,6 +267,43 @@ _created_ok:
     return fObj;
 }
 
+
+int fshm_chgrp(FILE *fshm_file, gid_t group)
+{
+    int fd;
+    uid_t ownerUid;
+    struct stat statBuf;
+
+    fd = fileno( fshm_file );
+    /* Check if fshm_file was a valid stream */
+    if ( unlikely( fd < 0 ) )
+    {
+        return -1;
+    }
+
+    /* Gather current uid on file */
+    if ( unlikely( fstat( fd, &statBuf ) != 0 ) )
+    {
+        return -1;
+    }
+
+    ownerUid = statBuf.st_uid;
+
+    /* Check if we are trying to change group to the current group (NOP) */
+    if ( unlikely ( statBuf.st_gid == group ) )
+    {
+        return 0;
+    }
+
+    /* Perform the actual chown call. */
+    if ( unlikely( fchown(fd, ownerUid, group) != 0 ) )
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
 int fshm_force_destroy(const char* name)
 {
     return shm_unlink(name);

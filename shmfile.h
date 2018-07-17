@@ -135,6 +135,39 @@ extern "C" {
  */
 FILE* fshm_open(const char* name, mode_t mode, int fshm_flags);
 
+
+/**
+ * fshm_chgrp - Change the group that owns this shmfile.
+ *
+ *      The shmfile created by fshm_open is assigned the gid
+ *        matching the primary group of the creating user.
+ *
+ *      The purpose is to allow guests in a different group access rights to
+ *        this shmfile ( based on the group bits in the mode set with fshm_open ),
+ *        but not just open up access for everybody ( using the "other" bits in mode ).
+ *
+ *      As non-root, you may change the group to any groups to which you are a member.
+ *        This includes your primary gid as well as all supplementry groups to which you belong.
+ *        As root, you may change the shmfile's group to any group existing on this system.
+ *
+ *
+ *  fshm_file - A FILE* object as returned by fshm_open.
+ *                 You must be the FSHM_OWNER of this shmfile to change permissions.
+ *
+ *
+ *  group     - new gid to replace current group on this shmfile.
+ *
+ *                  If you are not root, this must be either your primary gid
+ *                    or a group contained in your list of supplementry groups.
+ *
+ *
+ *  RETURN VALUE -
+ *                   0:  Success
+ *                  -1:  Failure (and errno will be set)
+ */
+int fshm_chgrp(FILE *fshm_file, gid_t group);
+
+
 /**
  * fshm_force_destroy - Forcibly destroy the shared memory region associated
  *                       with #name.
