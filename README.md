@@ -21,34 +21,39 @@ The guest only needs to know the unique name that the owner picked to have acces
 
 **Permissions**
 
-Permissions for who can map the same shm as FSHM\_GUEST are specified by the octal: "mode".
+Permissions for who can map the same shm as FSHM\_GUEST and what they can do with the shmfile are specified by the octal: "mode".
 
-These follow the same rules as chmod. For example, same user only and read-only would be 0400. Same user r/w, all other users r/o, 0644
+These follow the same rules as chmod.
+
+For example, same user only and read-only would be 0400. Same user r/w, all other users r/o, 0644
 
 
 You specify the mode when the *owner* creates the shmfile, which will later determine whomelse on the system may have access.
 
+The permissions are specified by the FSHM\_OWNER when creating the shmfile.
 
-The guest opening the already-created shmfile ( using FSHM\_GUEST ) may specify different permissions than those which the FSHM\_OWNER set on the shmfile, but they cannot exceed the owner's permissions. If such is attempted, for example if owner sets mode to 0644 and guest tries to open the stream with 0666, the guest's mode will be forced to 0644.
+If fshm\_open is used instead of fshm\_guest\_open to map an existing shmfile stream as FSHM\_GUEST, the mode argument is ignored.
 
 
 **Usage**
 
 
-The *fshm\_open* function returns a FILE\* object, with a valid integer file descriptor [ fd ].
+The *fshm\_open* is the core function that returns a FILE\* object, with a valid integer file descriptor [ fd ]. It is passed either FSHM\_OWNER or FSHM\_GUEST in the "flags" argument to define the operation.
+
+The owner may also create an shmfile stream by using the helper function, *fshm\_create*, and a guest may also map an existing shmfile stream by using the helper function, *fshm\_guest\_open*.
 
 You can read/write the data using either the buffered I/O functions (like fread, fwrite, fseek) and flushing with fflush, OR
 
-the unbuffered I/O functions (like read, write, lseek).
+the unbuffered I/O functions (like read, write, lseek) by using the fd returned by fileno( fileObj ) where fileObj is the FILE\* returned by one of the aforementioned functions. 
 
 
 The size is completely automatic, you do not need to allocate an underlying buffer -- any data written to it and flushed will
 expand the buffer automatically.
 
 
-There is no built-in locking, so it's suggested if you are going to have multiple processes writing to the stream, that you either use fixed-size sections for each process,
+There is no built-in locking, so it's suggested if you are going to have multiple processes writing to the stream, 
 
-or implement your own locking.
+that you either use fixed-size sections for each process, or implement your own locking.
 
 
 Public Functions
@@ -117,7 +122,7 @@ FILE \*fshm\_guest\_open(const char \*name);
 	 *                 * See fshm_open for more info
 	 */
 
-**fshm\_open** - Opens a stream
+**fshm\_open** - Opens a shmfile stream
 
 FILE\* fshm\_open(const char \*name, mode\_t mode, int fshm\_flags);
 
@@ -219,7 +224,7 @@ This is the "core" function, as fshm allows you to use all the other I/O systems
 	 *
 	 */
 
-**fshm\_chgrp** - Change the group "owner" of a shmfile stream
+**fshm\_chgrp** - Change the group associated with an shmfile stream
 
 int fshm\_chgrp(FILE \*fshm\_file, gid\_t group)
 
@@ -258,6 +263,8 @@ int fshm\_chgrp(FILE \*fshm\_file, gid\_t group)
 
 
 **fshm\_force\_destroy** - Forcibly destroys a stream, as a recovery tool.
+
+Use this function if the FSHM\_OWNER of a shmfile stream dies before calling fclose on the stream.
 
 int  fshm\_force\_destroy(const char \*name);
 
@@ -306,30 +313,26 @@ void shmfile\_get\_version(char \*major, char \*minor, char \*patchlevel, const 
 
 **Defined Constants**
 
-*FSHM\_OWNER* - Used as a flag with fshm\_open to denote that the current process and user
+*FSHM\_OWNER* - Used as a flag with fshm\_open to denote that the current process and user will create and own the shmfile stream.
 
-will create and own the shmfile stream.
-
-*FSHM\_GUEST* - Used as a flag with fshm\_open to denote that we want to map an existing
-
-shmfile stream.
-
+*FSHM\_GUEST* - Used as a flag with fshm\_open to denote that we want to map an existing shmfile stream.
 
 
 Examples
 --------
 
-examples/owner ( from examples/owner.c )  is an example that creates a stream ( as FSHM\_OWNER ),
+The source code contains the following examples/tests of libshmfile which can be used as references:
+
+**examples/owner** ( from examples/owner.c )  is an example that creates a stream ( as FSHM\_OWNER ),
  writes some data to it, and leaves it open for a period of time.
 
-examples/guest ( from examples/guest.c )  is an example that connects to an existing stream ( as FSHM\_GUEST ),
+**examples/guest** ( from examples/guest.c )  is an example that connects to an existing stream ( as FSHM\_GUEST ),
  reads data from it, and prints it to stdout.
 
 
-These examples test useing a struct as data which is given initial values by "owner", and is updated each time "guest" is run.
+These examples test using a struct as data which is given initial values by "owner", and is updated each time "guest" is run.
 
 The examples show both buffered I/O (fwrite and fflush), as well as unbuffered I/O (read and write).
 
 Optionally, the fshm\_chgrp method will be used if you uncomment and set the SET\_GID\_MACRO at the top of examples/owner.c
-
 
