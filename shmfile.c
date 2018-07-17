@@ -267,6 +267,17 @@ _created_ok:
     return fObj;
 }
 
+FILE* fshm_create(const char* name, mode_t mode)
+{
+    return fshm_open(name, mode, FSHM_OWNER);
+}
+
+
+FILE *fshm_guest_open(const char* name)
+{
+    return fshm_open(name, 0, FSHM_GUEST);
+}
+
 
 int fshm_chgrp(FILE *fshm_file, gid_t group)
 {

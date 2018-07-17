@@ -36,7 +36,7 @@ extern "C" {
 
 /***************************
  *  Options for fshm_flags
- ************/
+ **************************/
 
 #define FSHM_OWNER 1  /* FSHM_OWNER - This process will create and manage this stream. */
 #define FSHM_GUEST 2  /* FSHM_GUEST - This process will inherit an existing stream */
@@ -47,16 +47,79 @@ extern "C" {
  *************/
 
 /**
- * fshm_open - Open a shared memory and export as a STREAM,
- *   which will work with both FILE* and int filedes functions
- *    (e.x.  fwrite and write, fread and read, etc).
+ * fshm_create - Create a new shmfile (as FSHM_OWNER)
+ *                 with a given mode.
  *
- *  name - A name which corrosponds to this stream.
+ *
+ *  name - A unique name which corrosponds to this stream.
+ *          Guests will use this name as a reference to map
+ *           this shmfile stream.
  *
  *  mode - An octal representing the "mode" for guest mappings.
  *           Mode has same meaning as with chmod.
  *         This mode will be used to determine how FSHM_GUEST
  *           mappings will be able to access this stream.
+ *
+ *         See the 'fshm_open' function for more information
+ *          on mode.
+ *
+ *
+ *  RETURN VALUE - 
+ *                 A pointer to a FILE structure which may be used
+ *                  with standard io functions (e.x. fread, fprintf, fseek)
+ *
+ *                 On error, this function will return NULL and `errno' will be set
+ *
+ *  NOTES -
+ *                 * This is the same as calling fshm_open(name, mode, FSHM_OWNER)
+ *
+ *                 * See fshm_open for more info
+ */
+FILE* fshm_create(const char* name, mode_t mode);
+
+
+/**
+ * fshm_guest_open - Maps an existing shmfile stream (as FSHM_GUEST)
+ *                    using the given name for reference.
+ *
+ *
+ *  name - The name associated with an already-created fshmfile stream
+ *
+ *
+ *  RETURN VALUE -
+ *                 A pointer to a FILE structure which may be used
+ *                  with standard io functions (e.x. fread, fprintf, fseek)
+ *
+ *                 On error, this function will return NULL and `errno' will be set
+ *
+ *  NOTES -
+ *                 * This is the same as calling fshm_open(name, 0, FSHM_GUEST)
+ *
+ *                 * See fshm_open for more info
+ */
+FILE *fshm_guest_open(const char* name);
+
+
+/**
+ * fshm_open - Open a shared memory and export as a STREAM,
+ *   which will work with both FILE* and int filedes functions
+ *    (e.x.  fwrite and write, fread and read, etc).
+ *
+ *  name - A unique name which corrosponds to this stream.
+ *            If flags contain FSHM_OWNER, we attempt to create
+ *             a stream using this name.
+ *            Guests who wish to map this shmfile will provide
+ *             this same name to reference which shmfile stream
+ *             to map.
+ *
+ *  mode - An octal representing the "mode" for guest mappings.
+ *           Mode has same meaning as with chmod.
+ *         This mode will be used to determine how FSHM_GUEST
+ *           mappings will be able to access this stream.
+ *
+ *         This field only has meaning when creating the shmfile ( FSHM_OWNER ).
+ *          For an FSHM_GUEST open of an existing shmfile stream, this can be
+ *            set to 0.
  *
  *         Columns:
  *
@@ -76,9 +139,6 @@ extern "C" {
  *           - Add 2 to allow writing to the mapping
  *           - Add 1 to allow execution
  *
- *         A guest may request any mode, but if the requested mode
- *           exceeds what the owner set when creating, the guest's permissions
- *           will be truncated to match the owner's maximum mode.
  *
  *  Examples - Some examples of various #mode[s] and their meaning
  *
