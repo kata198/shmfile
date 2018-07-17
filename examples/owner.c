@@ -28,6 +28,14 @@
 
 #define DEFAULT_SLEEP_TIME 10
 
+/*
+  SET_GID_TO - If defined, will change the group of the shmfile mapping
+                   to the provided group id
+*/
+/*
+#define SET_GID_TO 1003
+*/
+
 
 int main(int argc, char* argv[])
 {
@@ -68,14 +76,15 @@ int main(int argc, char* argv[])
     printf("Trying to create fshm stream at:  \"%s\"\n\n", streamName);
 
     errno = 0;
-    fObj = fshm_open(streamName, 0775, FSHM_OWNER);
+    /*fObj = fshm_open(streamName, 0770, FSHM_OWNER);*/
+    fObj = fshm_create(streamName, 0770);
     if (!fObj)
     {
         if ( errno == EEXIST )
         {
             fprintf(stderr, "-- Existing stream, forcing close.\n\n");
             fshm_force_destroy(streamName);
-            fObj = fshm_open(streamName, 0775, FSHM_OWNER);
+            fObj = fshm_open(streamName, 0770, FSHM_OWNER);
         }
         else
         {
@@ -88,6 +97,21 @@ handle_fobj_null:
         fprintf(stderr, "Error! %d: %s\n", errno, strerror(errno));
         return 1;
     }
+
+    #ifdef SET_GID_TO
+      char *strError;
+      if ( fshm_chgrp(fObj, SET_GID_TO) != 0 )
+      {
+          strError = strerror(errno);
+          fprintf(stderr, "fshm_chgrp failed to change gid=%d with errno=%d. %s\n", \
+            SET_GID_TO, errno, strError
+          );
+      }
+      else
+      {
+          printf("fshm_chgrp successfully changed gid to %d\n", SET_GID_TO);
+      }
+    #endif
 
     printf("Writing data...\n\n");
 

@@ -48,7 +48,8 @@ int main(int argc, char* argv[])
 
     printf("Trying to open existing fshm stream at:  \"%s\"\n", streamName);
 
-    fObj = fshm_open(streamName, 0775, FSHM_GUEST);
+    /*fObj = fshm_open(streamName, 0775, FSHM_GUEST);*/
+    fObj = fshm_guest_open(streamName);
     if(!fObj)
     {
         fprintf(stderr, "Error opening stream! %d: %s\n", errno, strerror(errno));
