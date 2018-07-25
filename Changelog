@@ -21,3 +21,12 @@
   * Add "examples" target which will compile the example code
   * Add "examples_debug" target which will compile the example code with debug CFLAGS
 
+* Ensure that the "mode" provided to fshm_open is actually applied to the file. Now you can properly define rights (read/write) to owning user, owning group (now modifable by fshm_chgrp), and all other.
+
+* Implement a fshm_chmod function which can modify permissions afer a shmfile has been created
+
+* Implement a fshm_chgrp function which changes the group associated with the shmfile ( i.e. members of this group get max permissions as specified by the "group" bit in the "mode" parameter )
+
+* Add a new function, fshm_create(char *name, mode_t mode) for creating a new shmfile, which is a shorthand for fshm_open(name, mode, FSHM_OWNER)
+
+* Add a new function, fshm_guest_open(char *name) for mapping an existing shmfile, which is a shorthand for fshm_open(name, 0, FSHM_GUEST)
