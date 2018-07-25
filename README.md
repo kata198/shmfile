@@ -267,6 +267,25 @@ int fshm\_chgrp(FILE \*fshm\_file, gid\_t group)
 	 */
 
 
+**fshm\_chmod** - Change the mode (permissions) on this shmfile
+
+int fshm\_chmod(FILE \*fshm\_file, mode\_t mode);
+
+	/**
+	 * fshm_chmod - Change the mode on a shmfile
+	 *
+	 *   fshm_file - A FILE* object representing an shmfile stream
+	 *
+	 *   mode - An octal of permissions. See "chmod" for meaning.
+	 *
+	 *  RETURN VALUE -
+	 *                   0:  Success
+	 *                  -1:  Failure (and errno will be set)
+	 *
+	 *   See man 2 chmod for possible error conditions and values of errno
+	 */ 
+
+
 **fshm\_force\_destroy** - Forcibly destroys a stream, as a recovery tool.
 
 Use this function if the FSHM\_OWNER of a shmfile stream dies before calling fclose on the stream.
