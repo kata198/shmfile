@@ -303,7 +303,7 @@ int  fshm_force_destroy(const char *name);
  *
  *    Sets the value of *major, *minor, *patchlevel, and *extra to the numeric version numbers
  */
-void shmfile_get_version(char *major, char *minor, char *patchlevel, const char **extra);
+void shmfile_get_version(unsigned char *major, unsigned char *minor, unsigned char *patchlevel, const char **extra);
 
 
 #if defined (__cplusplus)

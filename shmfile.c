@@ -63,16 +63,16 @@ static volatile const char *product_name = "shmfile";
 static volatile const char *version   = "Version 0.1.1";
 
 typedef struct {
-    char major;
-    char minor;
-    char patchlevel;
+    unsigned char major;
+    unsigned char minor;
+    unsigned char patchlevel;
     const char *extra;
 }_shmfile_version_info_t;
 
-static volatile _shmfile_version_info_t _shmfile_version_info = { 0, 1, 1, "" };
+static volatile _shmfile_version_info_t _shmfile_version_info = { (unsigned char)0, (unsigned char)1, (unsigned char)1, "" };
 
 
-void shmfile_get_version(char *major, char *minor, char *patchlevel, const char **extra)
+void shmfile_get_version(unsigned char *major, unsigned char *minor, unsigned char *patchlevel, const char **extra)
 {
     *major = _shmfile_version_info.major;
     *minor = _shmfile_version_info.minor;
