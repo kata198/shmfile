@@ -339,7 +339,7 @@ int  fshm\_force\_destroy(const char \*name);
 
 **shmfile\_get\_version** - Gets version info on libshmfile
 
-void shmfile\_get\_version(char \*major, char \*minor, char \*patchlevel, const char \*\*extra);
+void shmfile\_get\_version(unsigned char \*major, unsigned char \*minor, unsigned char \*patchlevel, const char \*\*extra);
 
 	/**
 	 * shmfile_get_version - Get the version info on this version of shmfile
