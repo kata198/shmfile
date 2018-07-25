@@ -30,3 +30,5 @@
 * Add a new function, fshm_create(char *name, mode_t mode) for creating a new shmfile, which is a shorthand for fshm_open(name, mode, FSHM_OWNER)
 
 * Add a new function, fshm_guest_open(char *name) for mapping an existing shmfile, which is a shorthand for fshm_open(name, 0, FSHM_GUEST)
+
+* Update shmfile_get_version to use "unsigned char" instead of "char" for the version info (major, minor, patchlevel) as the version components will never be signed (negative)
