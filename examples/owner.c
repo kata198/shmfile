@@ -43,14 +43,14 @@ int main(int argc, char* argv[])
 
     char *streamName;
     int sleepTime;
-    char vmajor, vminor, vpatchlevel;
+    unsigned char vmajor, vminor, vpatchlevel;
     const char* vextra;
 
     OwnerGuestData data = { 0 };
 
     shmfile_get_version(&vmajor, &vminor, &vpatchlevel, &vextra);
 
-    printf("shmfile version: %hhd.%hhd.%hhd%s\n", vmajor, vminor, vpatchlevel, vextra);
+    printf("shmfile version: %hhu.%hhu.%hhu%s\n", vmajor, vminor, vpatchlevel, vextra);
 
     if ( argc == 1 )
     {
