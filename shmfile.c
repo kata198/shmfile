@@ -265,8 +265,11 @@ _created_ok:
     /* Set the _fileno field so fileno() and then non-f* functions work  */
     fObj->_fileno = fd;
 
-    /* Set the mode permissions on this shmfile */
-    fchmod(fd, mode);
+    if ( fshm_flags & FSHM_OWNER )
+    {
+        /* Set the mode permissions on this shmfile */
+        fchmod(fd, mode);
+    }
 
     return fObj;
 }
