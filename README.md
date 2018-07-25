@@ -127,12 +127,14 @@ FILE \*fshm\_guest\_open(const char \*name);
 FILE\* fshm\_open(const char \*name, mode\_t mode, int fshm\_flags);
 
 
-This is the "core" function, as fshm allows you to use all the other I/O systems that come standard with libc.
+This is the "core" function, and can be used both to create a new shared memory stream or open an existing stream. The FILE pointer returned allows you to use all the other I/O systems that come standard with libc.
 
 
 	/**
-	 * fshm_open - Open a shared memory and export as a STREAM,
-	 *   which will work with both FILE* and int filedes functions
+	 * fshm_open - Open a shared memory stream, either creating a new
+     *   stream [FSHM_OWNER] or mapping an existing stream [FSHM_GUEST],
+     *   and returning a FILE* object with an associated int fd.
+	 *   This will work with both FILE* and int filedes functions
 	 *    (e.x.  fwrite and write, fread and read, etc).
 	 *
 	 *  name - A unique name which corrosponds to this stream.
@@ -149,7 +151,7 @@ This is the "core" function, as fshm allows you to use all the other I/O systems
 	 *
 	 *         This field only has meaning when creating the shmfile ( FSHM_OWNER ).
 	 *          For an FSHM_GUEST open of an existing shmfile stream, this can be
-	 *            set to 0.
+	 *            set to 0. Any other value will be ignored when flags contains FSHM_GUEST.
 	 *
 	 *         Columns:
 	 *
@@ -229,7 +231,7 @@ This is the "core" function, as fshm allows you to use all the other I/O systems
 int fshm\_chgrp(FILE \*fshm\_file, gid\_t group)
 
 	/**
-	 * fshm_chgrp - Change the group that owns this shmfile.
+	 * fshm_chgrp - Change the group associated with an existing shmfile stream
 	 *
 	 *      You must be the the same user as the FSHM_OWNER of the given stream,
 	 *        or root in order to change the gid assigned to the shmfile.
@@ -259,6 +261,9 @@ int fshm\_chgrp(FILE \*fshm\_file, gid\_t group)
 	 *  RETURN VALUE -
 	 *                   0:  Success
 	 *                  -1:  Failure (and errno will be set)
+	 *
+	 *   See man 2 chown for possible error conditions and values of errno
+	 * 
 	 */
 
 
@@ -272,12 +277,14 @@ int  fshm\_force\_destroy(const char \*name);
 	 * fshm_force_destroy - Forcibly destroy the shared memory region associated
 	 *                       with #name.
 	 *
-	 *  name - The name associated with this stream
-	 *
-	 *
 	 *   Normal operation does not require this, however, if a process opens
 	 *     a fshm stream as FSHM_OWNER, and does not close it before terminating,
 	 *     the stream will maintain stuck open without an owner.
+	 *
+	 *
+	 *    name - The name associated with this stream
+	 *
+	 *  NOTES - 
 	 *
 	 *   The owner should test for this, and forcibly destroy if required.
 	 *
