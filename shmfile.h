@@ -238,6 +238,23 @@ int fshm_chgrp(FILE *fshm_file, gid_t group);
 
 
 /**
+ * fshm_chmod - Change the mode on a shmfile
+ *
+ *   fshm_file - A FILE* object representing an shmfile stream
+ *
+ *   mode - An octal of permissions. See "chmod" for meaning.
+ *
+ *  RETURN VALUE -
+ *                   0:  Success
+ *                  -1:  Failure (and errno will be set)
+ *
+ *   See man 2 chmod for possible error conditions and values of errno
+ */ 
+int fshm_chmod(FILE *fshm_file, mode_t mode);
+
+
+
+/**
  * fshm_force_destroy - Forcibly destroy the shared memory region associated
  *                       with #name.
  *

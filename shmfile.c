@@ -100,6 +100,7 @@ __visibility_hidden ssize_t _fshm_read(void *cookie, char *buf, size_t size)
 
     fshmCookie = FSHM_COOKIE(cookie);
 
+
     ret = read(fshmCookie->fd, buf, size);
 
     return ret;
@@ -264,6 +265,9 @@ _created_ok:
     /* Set the _fileno field so fileno() and then non-f* functions work  */
     fObj->_fileno = fd;
 
+    /* Set the mode permissions on this shmfile */
+    fchmod(fd, mode);
+
     return fObj;
 }
 
@@ -314,6 +318,30 @@ int fshm_chgrp(FILE *fshm_file, gid_t group)
 
     return 0;
 }
+
+int fshm_chmod(FILE *fshm_file, mode_t mode)
+{
+    int fd;
+
+    fd = fileno( fshm_file );
+
+    /* Check if fshm_file was a valid stream */
+    if ( unlikely( fd < 0 ) )
+    {
+        errno = ENOENT;
+        return -1;
+    }
+
+    /* Perform the actual chmod call */
+    if ( unlikely( fchmod(fd, mode) != 0 ) )
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+
 
 int fshm_force_destroy(const char *name)
 {
