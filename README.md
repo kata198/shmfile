@@ -144,10 +144,16 @@ This is the "core" function, and can be used both to create a new shared memory 
 	 *             this same name to reference which shmfile stream
 	 *             to map.
 	 *
-	 *  mode - An octal representing the "mode" for guest mappings.
+	 *  mode - An octal representing the "mode" for this file stream.
 	 *           Mode has same meaning as with chmod.
+	 *
 	 *         This mode will be used to determine how FSHM_GUEST
 	 *           mappings will be able to access this stream.
+	 *
+	 *         It will also define the permissions (read/write/execute) for the
+	 *           owner / group-member / other
+	 *         relations on mappings.
+	 *
 	 *
 	 *         This field only has meaning when creating the shmfile ( FSHM_OWNER ).
 	 *          For an FSHM_GUEST open of an existing shmfile stream, this can be
@@ -156,9 +162,14 @@ This is the "core" function, and can be used both to create a new shared memory 
 	 *         Columns:
 	 *
 	 *          - First column from left is always 0 for now (no sticky/setguid bit meaning)
+	 *
 	 *          - Second column from left is permissions for owner (user who creates shmfile)
-	 *          - Third column from the left is permissions for users who share primary
-	 *            group with creating user
+	 *
+	 *          - Third column from the left is permissions for users who are a member of
+	 *            the group associated with this stream. 
+	 *            This could be primary group of creating user (FSHM_OWNER), or a different
+	 *            group (set by fshm_chgrp).
+	 *            
 	 *          - Fourth column from the left are permissions for any user which
 	 *            does NOT fall into any categories listed above
 	 *
@@ -167,7 +178,7 @@ This is the "core" function, and can be used both to create a new shared memory 
 	 *          For each column, the number is derived by starting with 0
 	 *            and following these rules:
 	 *
-	 *           - Add 4 to allow guest mapping and read for represented set
+	 *           - Add 4 to allow FSHM_GUEST mapping and read for represented set
 	 *           - Add 2 to allow writing to the mapping
 	 *           - Add 1 to allow execution
 	 *
