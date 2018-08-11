@@ -76,8 +76,8 @@ int main(int argc, char* argv[])
     printf("Trying to create fshm stream at:  \"%s\"\n\n", streamName);
 
     errno = 0;
-    /*fObj = fshm_open(streamName, 0770, FSHM_OWNER);*/
-    fObj = fshm_create(streamName, 0770);
+    fObj = fshm_open(streamName, 0770, FSHM_OWNER | FSHM_PERSIST);
+    /*fObj = fshm_create(streamName, 0770);*/
     if (!fObj)
     {
         if ( errno == EEXIST )

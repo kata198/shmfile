@@ -53,8 +53,12 @@
 #define IS_FSHM_OWNER(_cookie) !!( FSHM_COOKIE(_cookie)->fshm_flags & FSHM_OWNER )
 #define IS_FSHM_GUEST(_cookie) !!( FSHM_COOKIE(_cookie)->fshm_flags & FSHM_GUEST )
 
+#define IS_FSHM_PERSISTENT(_cookie) !!( FSHM_COOKIE(_cookie)->fshm_flags & FSHM_PERSIST )
+
 #define IS_FSHM_FLAGS_OWNER(_fshm_flags) !!( _fshm_flags & FSHM_OWNER )
 #define IS_FSHM_FLAGS_GUEST(_fshm_flags) !!( _fshm_flags & FSHM_GUEST )
+
+#define IS_FSHM_FLAGS_PERSIST(_fshm_flags) !!( _fshm_flags & FSHM_PERSIST )
 
 
 static volatile const char *copyright = "Copyright (c) 2017, 2018 Timothy Savannah   All Rights Reserved,  licensed under terms of Lesser GNU Public License version 2.1";
@@ -148,7 +152,7 @@ __visibility_hidden int _fshm_close(void *cookie)
 
     fshmCookie = FSHM_COOKIE(cookie);
 
-    if ( IS_FSHM_OWNER(fshmCookie) )
+    if ( IS_FSHM_OWNER(fshmCookie) && !IS_FSHM_PERSISTENT(cookie) )
     {
         ret = shm_unlink(fshmCookie->name);
     }

@@ -41,6 +41,10 @@ extern "C" {
 #define FSHM_OWNER 1  /* FSHM_OWNER - This process will create and manage this stream. */
 #define FSHM_GUEST 2  /* FSHM_GUEST - This process will inherit an existing stream */
 
+#define FSHM_PERSIST 4 /* FSHM_PERSIST - Do NOT remove this stream when the FSHM_OWNER closes it.
+                        *                 fshm_force_destroy must be used to destroy the stream
+                        *                 when this flag is provided.
+                        */
 
 /*******************
  * PUBLIC API
