@@ -1,0 +1,101 @@
+'\" et
+.TH fshm_open 3 "2018-08-10" "shmfile" "shmfile"
+
+.SH NAME
+.P
+.nf
+fshm_open, fshm_create, fshm_guest_open - Functions to create and/or open a shared memory stream
+.fi
+.SH SYNOPSIS
+.nf
+.B #include <stdio.h> /* For FILE structure */
+
+.B #include <sys/stat.h> /* for mode constants */
+
+.B #include <shmfile.h>
+
+
+.B FILE* fshm_open(const char *\fIname\fP, mode_t \fImode\fP, int \fIfshm_flags\fP);
+
+.B FILE* fshm_create(const char *\fIname\fP, mode_t \fImode\fP);
+
+.B FILE *fshm_guest_open(const char *\fIname\fP);
+
+.B int fshm_force_destroy(const char *\fIname\fP);
+
+.SH DESCRIPTION
+
+.P
+shmfile provides a means to name and map a region of memory as a named stream.
+
+The FILE struct returned can be used with all the standard FILE stream functions
+(e.x. \fBfprintf\fP, \fBfwrite\fP, \fBfread\fP, \fBfseek\fP )
+.fi
+and it also provides a valid file descriptor (obtained by calling \fBfileno\fP on the returned FILE*)
+which allow it to be used with the methods which take an integer fd (e.x. \fBwrite\fP, \fBread\fP, \fBlseek\fP).
+.PP
+Keep in mind if you use the buffered stream functions, you may have to call \fBfflush(3)\fP to ensure contents are flushed to the stream.
+.PP
+The \fIname\fP argument given when creating a new stream ( via either \fBfshm_create\fP or by providing \fBFSHM_OWNER\fP in the \fIfshm_flags\fP parameter of \fBfshm_open\fP ) can be used by any other process to map the same stream ( via either \fBfshm_guest_open\fP or by providing \fIFSHM_GUEST\fP in the \fIfshm_flags\fP parameter of \fBfshm_open\fP ).
+.PP
+Control to what other users on the system can map this stream as an \fIFSHM_GUEST\fP follows standard POSIX filesystem permissions rules. The \fImode\fP is an octal which sets read/write/execute permissions for owner/guest/other. See \fBchmod(3)\fP for more info on mode.
+
+The mode can be changed after creation by calling \fBfshm_chmod(3)\fP.
+.PP
+The default group which "owns" this stream is the primary group of the user who created the stream ( the \fBFSHM_OWNER\fP ).
+
+This group may be changed by calling \fBfshm_chgrp(3)\fP.
+.P
+\fBfshm_open\fP is the main function for opening a shmfile. The \fImode\fP argument is ignored unless \fIfshm_flags\fP contains \fIFSHM_OWNER\fP. Either \fIFSHM_OWNER\fP or \fIFSHM_GUEST\fP must be present in flags. More info below.
+.PP
+\fBfshm_create\fP is a convenience method of \fBfshm_open\fP which forces \fIfshm_flags\fP to be \fIFSHM_OWNER\fP.
+.PP
+\fBfshm_guest_open\fP is a convenience method of \fBfshm_open\fP which forces \fIfshm_flags\fP to be \fIFSHM_GUEST\fP and omits the \fImode\fP parameter (which is ignored when FSHM_GUEST is specified in flags)
+.PP
+\fBfshm_force_destroy\fP is a method which will force destroying a shared memory stream by \fIname\fP.
+.PP
+Normally, when an \fIFSHM_OWNER\fP closes a stream ( via \fBfclose\fP(3) ) the stream will automatically be destroyed. But if \fIFSHM_PERSIST\fP is specified in flags when creating or the owner does not close the stream before terminating, this method will do the job.
+
+.SH fshm_flags
+.P
+The \fIfshm_flags\fP parameter of \fBfshm_open\fP must contain one of the following values:
+.PP
+\fBFSHM_OWNER\fP - Specifies that this call will create the stream
+specified by \fIname\fP .
+.PP
+When the owner closes the stream (via \fBfclose(3)\fP),
+the stream will be destroyed (unless \fIFSHM_PERSIST\fP is specified in \fIfshm_flags\fP.
+
+If the owner does not close the stream, or it is an \fIFSHM_PERSIST\fP stream, and you wish to destroy it (for example, before creating another with the same name), use
+\fBfshm_force_destroy\fP
+.PP
+\fBFSHM_GUEST\fP - Specifies that this call will open an existing stream
+specified by \fIname\fP.
+.PP
+An \fIFSHM_OWNER\fP must have created this stream already, or the call will fail.
+.PP
+Closing the stream as a guest will not destroy the file.
+.PP
+The following flags may be OR'd with \fIFSHM_OWNER\fP to alter default behaviour.
+.PP
+\fBFSHM_PERSIST\fP - Prevents this stream from being destroyed when the FSHM_OWNER closes it.
+.PP
+When you are finished with the stream or want to recreate using the same name, you must call \fBfshm_force_destroy(\fIname\fP\fB)\fP to destroy it.
+
+.SH RETURN VALUE
+.P
+Upon success, returns a FILE pointer to the created stream.
+.PP
+If there was an error, NULL is returned and \fBerrno\fP is set accordingly.
+
+.SH AUTHOR
+
+shmfile can be found at https://github.com/kata198/shmfile
+
+Created and maintained by Timothy Savannah
+
+.SH SEE ALSO
+
+.P
+\fBfshm_chmod\fP(3) and \fBfshm_chgrp\fP(3) - Changing \fImode\fP and group for a given shmfile
+
