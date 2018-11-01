@@ -15,6 +15,10 @@
 #
 #                      To install to a package, do:      make install DESTDIR="${pkgdir}"
 #
+#						Also installs include headers and man pages
+#
+#      install_static - Installs libshmfile.a into $DESTDIR/$PREFIX/lib
+#
 #      clean         - Remove all compiled stuff
 #
 #      distclean     - Return to a completely fresh state
@@ -62,35 +66,57 @@ EXAMPLES_ADDITIONAL_FLAGS = -I "${_LIB_PATH}" -Wl,-rpath="${_LIB_PATH}"
 INSTALLPREFIX = $(shell echo "${DESTDIR}/${PREFIX}" | sed 's|//|/|g')
 
 
+SHARED_LIB_FILES = libshmfile.so
+STATIC_LIB_FILES = libshmfile.a
+
+MAN3_FILES = man/fshm_open.3.gz
+
+# ALL_FILES - The "all" standard build (shared lib and man page)
+#   static is handled separate
+ALL_FILES = ${SHARED_LIB_FILES} ${MAN3_FILES}
+
+EXAMPLE_FILES = examples/owner examples/guest
+
 ##############
 ## Targets
 ##########
 
-all: libshmfile.so
+all: ${ALL_FILES}
 
-debug: libshmfile.so
+debug: ${ALL_FILES}
 	make clean; make CFLAGS="${DEBUG_CFLAGS}" LDFLAGS=""
 
-static: libshmfile.a
+static: ${STATIC_LIB_FILES}
 
 clean:
-	rm -f libshmfile.so libshmfile.a examples/owner.o examples/owner examples/guest.o examples/guest shmfile.o
+	rm -f ${SHARED_LIB_FILES} ${STATIC_LIB_FILES} ${MAN3_FILES} examples/owner examples/guest shmfile.o
 
 distclean: clean
 
-install: libshmfile.so
+install: ${ALL_FILES}
+	# Install shared lib
 	mkdir -p "${INSTALLPREFIX}/lib"
 	install -m 775 libshmfile.so "${INSTALLPREFIX}/lib"
+	# Install include headers
 	mkdir -p "${INSTALLPREFIX}/include"
 	install -m 664 shmfile.h "${INSTALLPREFIX}/include"
+	# Install man pages
+	mkdir -p "${INSTALLPREFIX}/share/man3"
+	install -m 644 man/fshm_open.3.gz "${INSTALLPREFIX}/share/man/man3"
+	# Symlink alternate names for fshm_open.3.gz man page
+	ln -sf fshm_open.3.gz fshm_create.3.gz
+	ln -sf fshm_open.3.gz fshm_guest_open.3.gz
+	ln -sf fshm_open.3.gz fshm_force_destroy.3.gz
+	mv fshm_create.3.gz fshm_guest_open.3.gz fshm_force_destroy.3.gz "${INSTALLPREFIX}/share/man/man3"
 
-install_static: libshmfile.a
+
+install_static: ${STATIC_LIB_FILES}
 	mkdir -p "${INSTALLPREFIX}/lib"
 	install -m 644 libshmfile.a "${INSTALLPREFIX}/lib"
 
-examples: libshmfile.so examples/owner examples/guest
+examples: ${SHARED_LIB_FILES} ${EXAMPLE_FILES}
 
-examples_debug: libshmfile.so examples/owner examples/guest
+examples_debug: ${SHARED_LIB_FILES} ${EXAMPLE_FILES}
 	make clean; make CFLAGS="${DEBUG_CFLAGS}" LDFLAGS="" examples
 
 libshmfile.a: shmfile.o
@@ -107,5 +133,9 @@ examples/owner: examples/owner.c examples/owner_guest_private.h shmfile.h
 
 examples/guest: examples/guest.c examples/owner_guest_private.h shmfile.h 
 	gcc examples/guest.c ${USE_CFLAGS_EXEC} ${EXAMPLES_ADDITIONAL_FLAGS} -o examples/guest
+
+
+man/fshm_open.3.gz: man/fshm_open.3
+	cat man/fshm_open.3 | gzip -c > man/fshm_open.3.gz
 
 # vim: set ts=4 sw=4 st=4 noexpandtab:
