@@ -64,7 +64,7 @@
 static volatile const char *copyright = "Copyright (c) 2017, 2018 Timothy Savannah   All Rights Reserved,  licensed under terms of Lesser GNU Public License version 2.1";
 
 static volatile const char *product_name = "shmfile";
-static volatile const char *version   = "Version 1.0.0";
+static volatile const char *version   = "Version 1.1.0";
 
 typedef struct {
     unsigned char major;
@@ -73,7 +73,7 @@ typedef struct {
     const char *extra;
 }_shmfile_version_info_t;
 
-static volatile _shmfile_version_info_t _shmfile_version_info = { (unsigned char)1, (unsigned char)0, (unsigned char)0, "" };
+static volatile _shmfile_version_info_t _shmfile_version_info = { (unsigned char)1, (unsigned char)1, (unsigned char)0, "" };
 
 
 void shmfile_get_version(unsigned char *major, unsigned char *minor, unsigned char *patchlevel, const char **extra)
