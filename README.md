@@ -358,6 +358,8 @@ void shmfile\_get\_version(unsigned char \*major, unsigned char \*minor, unsigne
 
 *FSHM\_GUEST* - Used as a flag with fshm\_open to denote that we want to map an existing shmfile stream.
 
+*FSHM\_PERSIST* - Used as a flag with fshm\_open to denote that we should not automatically destroy the stream when the FSHM\_OWNER closes it. If the owner provides this flag then the stream must be explicitly destroyed by calling fshm\_force\_destroy
+
 
 Examples
 --------
