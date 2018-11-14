@@ -212,6 +212,10 @@ This is the "core" function, and can be used both to create a new shared memory 
 	 *                    this stream already, or the call will fail.
 	 *                    Closing the stream as a guest will not destroy the file.
 	 *
+	 *     FSHM_PERSIST - Do NOT remove this stream when the FSHM_OWNER closes it.
+	 *                     fshm_force_destroy must be used to destroy the stream
+	 *                     when this flag is provided.
+	 *
 	 *  Return:
 	 *
 	 *     A FILE* object on success, otherwise NULL and errno is set.
