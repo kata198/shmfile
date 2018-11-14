@@ -36,6 +36,7 @@
 #define SET_GID_TO 1003
 */
 
+void _fshm_printCopyrightVersion(void);
 
 int main(int argc, char* argv[])
 {
@@ -47,10 +48,6 @@ int main(int argc, char* argv[])
     const char* vextra;
 
     OwnerGuestData data = { 0 };
-
-    shmfile_get_version(&vmajor, &vminor, &vpatchlevel, &vextra);
-
-    printf("shmfile version: %hhu.%hhu.%hhu%s\n", vmajor, vminor, vpatchlevel, vextra);
 
     if ( argc == 1 )
     {
@@ -72,6 +69,16 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Wrong number of arguments.\n\nUsage: owner (optional: [stream name] [sleep time])\n");
         return EINVAL;
     }
+
+    if ( strcmp(streamName, "--version") == 0 )
+    {
+        _fshm_printCopyrightVersion();
+        return 0;
+    }
+    shmfile_get_version(&vmajor, &vminor, &vpatchlevel, &vextra);
+
+    printf("shmfile version: %hhu.%hhu.%hhu%s\n", vmajor, vminor, vpatchlevel, vextra);
+
 
     printf("Trying to create fshm stream at:  \"%s\"\n\n", streamName);
 

@@ -25,6 +25,8 @@
 
 #include "owner_guest_private.h"
 
+void _fshm_printCopyrightVersion(void);
+
 int main(int argc, char* argv[])
 {
     FILE *fObj;
@@ -39,6 +41,11 @@ int main(int argc, char* argv[])
     else if ( argc == 2 )
     {
         streamName = argv[1];
+        if ( strcmp(streamName, "--version") == 0 )
+        {
+            _fshm_printCopyrightVersion();
+            return 0;
+        }
     }
     else
     {
