@@ -101,7 +101,7 @@ install: ${ALL_FILES}
 	mkdir -p "${INSTALLPREFIX}/include"
 	install -m 664 shmfile.h "${INSTALLPREFIX}/include"
 	# Install man pages
-	mkdir -p "${INSTALLPREFIX}/share/man3"
+	mkdir -p "${INSTALLPREFIX}/share/man/man3"
 	install -m 644 man/fshm_open.3.gz "${INSTALLPREFIX}/share/man/man3"
 	# Symlink alternate names for fshm_open.3.gz man page
 	ln -sf fshm_open.3.gz fshm_create.3.gz
