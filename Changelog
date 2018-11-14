@@ -1,3 +1,14 @@
+1.1.0 - Nov 13 2018
+
+* Add FSHM_PERSIST flag as a possible option to be OR'd into fshm_flags on fshm_open.
+ - When present, this will cause the shmfile to not be deleted when the FSHM_OWNER closes it.
+ - The stream must be explicitly destroyed by fshm_force_destroy
+
+* Add man page, available under: fshm_open, fshm_create, fshm_guest_open, fshm_force_destroy
+
+* Cleanup Makefile a bit
+
+
 1.0.0 - Jul 24 2018
 
 * Makefile: updates, bugfixes, expansion, cleanup
